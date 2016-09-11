@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Arduino Two Temperatures</title>
+<script src="jquery.min.js"></script>
+<script src="bootstrap-switch.min.js"></script>
+<script src="gauge.js"></script>
+
+<link href="bootstrap.min.css" rel="stylesheet">
+<link href="bootstrap-switch.min.css" rel="stylesheet">
+<script>
+    $(function() {
+        // Initialize all switch buttons
+        var initialized = false;
+        var switches = $('.switch');
+        switches.bootstrapSwitch();
+ 
+        // Get current statuses and enable available buttons and set statuses
+        $.get("switches", function(data) {
+            // Update button status
+            $.each(data, function(key, attrs) {
+                var switch_button = $('*[data-type="'+key+'"]');
+                switch_button.bootstrapSwitch('toggleDisabled');
+                switch_button.bootstrapSwitch('state', attrs);
+            });
+ 
+            initialized = true;
+        }, "json" );
+ 
+ 
+        // Update switch status
+        switches.on('switchChange.bootstrapSwitch', function(event, state) {
+            // Do not do posts if initial state is not ready
+            if(initialized) {
+                // Disable button for a moment
+                var current_switch = $(this);
+                current_switch.bootstrapSwitch('toggleDisabled');
+ 
+                // Get switch type and set status to current as current state
+                var switch_type = $(this).data('type');
+                $.get("switches?"+switch_type+"="+ +state, function(data) {
+                    current_switch.bootstrapSwitch('toggleDisabled');
+                    current_switch.bootstrapSwitch('state', data[switch_type]);
+                }, "json" );
+            }
+        });
+    });
+</script>
+
+        <script>
+        function GetArduinoInputs()
+        {
+            nocache = "?nocache=" + Math.random() * 1000000;
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function()
+            {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {
+                      var jsonData = JSON.parse(this.responseText);
+
+                      data_val = jsonData.main_sensor;
+                      data_val2 = jsonData.backup_sensor;
+                        
+                  }
+                }
+            }
+            request.open("GET", "gauge" + nocache, true);
+            request.send(null);
+            setTimeout('GetArduinoInputs()', 1000);
+        }
+    </script>
+    </head>
+    <body onload="GetArduinoInputs()">
+        
+        <h1>Compressor control</h1>
+
+        <p>
+        <table>
+            <tr><td>Power</td><td><input data-type="power" type="checkbox" class="switch" disabled checked></td></tr>
+            
+        </table>
+        </p>
+
+        <canvas id="an_gauge_1" data-title="Main" data-units="Temp. &deg;C" width="500" height="500" data-major-ticks="10 15 20 25 30 35 40 45 50 55 60" data-type="canv-gauge" data-min-value="10" data-max-value="60" data-highlights="10 20 #4D89F2, 20 36 #25B8D9, 36 38 #0BB950, 38 42 #cc5, 42 60 #f33" data-onready="setInterval( function() { Gauge.Collection.get('an_gauge_1').setValue(data_val);}, 1000);"></canvas>
+
+        <canvas id="an_gauge_2" data-title="Backup" data-units="Temp. &deg;C" width="500" height="500" data-major-ticks="10 15 20 25 30 35 40 45 50 55 60" data-type="canv-gauge" data-min-value="10" data-max-value="60" data-highlights="10 20 #4D89F2, 20 36 #25B8D9, 36 38 #0BB950, 38 42 #cc5, 42 60 #f33" data-onready="setInterval( function() { Gauge.Collection.get('an_gauge_2').setValue(data_val2);}, 1000);"></canvas>
+    </body>
+</html>

@@ -1,0 +1,8 @@
+CompressorSettings.pidSensorAddr max_size:8
+CompressorSettings.hotWaterSensorAddr max_size:8
+CompressorSettings.coolingStartSensorAddr max_size:8
+CompressorSettings.coolingStopSensorAddr max_size:8
+
+TempInfo.SensorAddr max_size:8
+//TempInfo.SensorRawData max_size:9
+

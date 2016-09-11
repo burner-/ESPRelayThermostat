@@ -1,0 +1,45 @@
+message CompressorSettings
+{
+	optional int32 compressorId = 1;
+	optional float pidSetpoint = 2; // Pid for compressor over heat protection
+	optional float pidP = 3;
+	optional float pidI = 4;
+	optional float pidD = 5;
+	optional float requestedHotWaterTemp = 6; // temp < requestedHotWaterTemp = use pid for hot water valve
+	optional float heatingHysteresis = 7; //requestedHotWaterTemp + heatingHysteresis = return to normal mode
+	optional float requestedCoolWaterTemp = 8; // temp > requestedCoolWaterTemp = start compressor
+	optional float coolingHysteresis = 9; //requestedCoolWaterTemp - coolingHysteresis = stop temp
+	
+	// temp sensor onewire addresses
+	optional bytes pidSensorAddr = 10; //Sensor address for hot water pid controlling
+	optional bytes hotWaterSensorAddr = 11; //Sensor address for hot water heating request
+	optional bytes coolingStartSensorAddr = 12; //Sensor address for cooling start
+	optional bytes coolingStopSensorAddr = 13; //Sensor address for cooling stop
+}
+
+message TempInfo
+{
+	optional bytes SensorAddr = 1;
+	optional float Temp = 2;
+	//optional bytes SensorRawData = 3;
+}
+
+message PIDInfo
+{
+	optional int32 compressorId = 1;
+	optional float In = 2;
+	optional float Out = 3;
+	optional float P = 4;
+	optional float I = 5;
+	optional float D = 6;
+	optional float dispP = 7;
+	optional float dispI = 8;
+	optional float dispD = 9;
+}
+
+message FlowInfo
+{
+	optional int32 sensorId = 1;
+	optional int32 LitersPerSecond = 2;
+	optional int32 absoluteValue = 3;
+}
